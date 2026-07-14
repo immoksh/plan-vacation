@@ -1,0 +1,27 @@
+{
+  "name": "plan-vacation",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/immoksh/plan-vacation.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/immoksh/plan-vacation/issues"
+  },
+  "homepage": "https://github.com/immoksh/plan-vacation#readme",
+  "dependencies": {
+    "@apollo/server": "^5.5.1",
+    "@types/node": "^26.1.1",
+    "express": "^5.2.1",
+    "graphql": "^16.14.2",
+    "typescript": "^7.0.2"
+  }
+}
