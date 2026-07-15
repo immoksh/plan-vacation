@@ -4,7 +4,11 @@ import type { Place } from "../types.js";
 export type StoredLocation = Place & { id: number };
 
 export function toSlug(name: string): string {
-  return name.trim().toLowerCase();
+  return name
+    .trim()
+    .toLowerCase()
+    .replace(/\s*,\s*/g, ", ") // tidy the spacing around a country hint
+    .replace(/\s+/g, " "); // collapse any other runs of whitespace
 }
 
 export function findLocation(slug: string): StoredLocation | null {

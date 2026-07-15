@@ -49,6 +49,8 @@ export type PlaceForecast = {
 export type RawPlace = {
   name: string;
   country?: string;
+  country_code?: string; // two-letter code, e.g. "CH"
+  admin1?: string; // state / region, e.g. "Valais"
   latitude: number;
   longitude: number;
   timezone?: string;

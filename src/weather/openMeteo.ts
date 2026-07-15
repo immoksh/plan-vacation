@@ -23,10 +23,14 @@ const MARINE_DAILY_FIELDS = [
   "swell_wave_period_max",
 ];
 
-export async function findPlace(name: string): Promise<Place | null> {
+export async function findPlace(query: string): Promise<Place | null> {
+  // "Alps, Switzerland" -> look up "Alps" but only accept a Swiss result.
+  // "Alps" on its own -> just take Open-Meteo's top match.
+  const { name, country } = splitQuery(query);
+
   const url = `${GEOCODE_URL}?${new URLSearchParams({
     name,
-    count: "1",
+    count: country ? "10" : "1",
     language: "en",
     format: "json",
   })}`;
@@ -37,7 +41,8 @@ export async function findPlace(name: string): Promise<Place | null> {
   }
 
   const body = (await res.json()) as { results?: RawPlace[] };
-  const hit = body.results?.[0];
+  const results = body.results ?? [];
+  const hit = country ? results.find((r) => matchesCountry(r, country)) : results[0];
   if (!hit) return null;
 
   return {
@@ -50,7 +55,26 @@ export async function findPlace(name: string): Promise<Place | null> {
   };
 }
 
-// Pull the next 7 days of daily weather for a set of coordinates.
+function splitQuery(query: string): { name: string; country?: string } {
+  const comma = query.indexOf(",");
+  if (comma === -1) return { name: query.trim() };
+
+  const name = query.slice(0, comma).trim();
+  const country = query.slice(comma + 1).trim();
+  return country ? { name, country } : { name };
+}
+
+// Does a candidate sit in the country the user asked for? We accept the country
+// name, its two-letter code, or the state/region, all case-insensitive.
+function matchesCountry(place: RawPlace, want: string): boolean {
+  const wanted = want.toLowerCase();
+  return (
+    place.country?.toLowerCase() === wanted ||
+    place.country_code?.toLowerCase() === wanted ||
+    place.admin1?.toLowerCase() === wanted
+  );
+}
+
 export async function getWeek(latitude: number, longitude: number): Promise<WeatherDay[]> {
   const url = `${FORECAST_URL}?${new URLSearchParams({
     latitude: String(latitude),
@@ -100,12 +124,12 @@ export async function getMarineWeek(latitude: number, longitude: number): Promis
   try {
     res = await fetch(url);
   } catch (err) {
-    console.warn(`[marine] fetch failed for ${latitude},${longitude}: ${String(err)}`);
+    console.log(`fetch failed for ${latitude},${longitude}: ${String(err)}`);
     return [];
   }
 
   if (!res.ok) {
-    console.warn(`[marine] no marine forecast (${res.status}) for ${latitude},${longitude}`);
+    console.log(`no marine forecast (${res.status}) for ${latitude},${longitude}`);
     return [];
   }
 

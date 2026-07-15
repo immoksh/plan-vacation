@@ -30,6 +30,11 @@ best-first with a 0–100 score and a short reason:
 }
 ```
 
+Ambiguous names can be pinned to a country: `vacationForecast(place: "London, Canada")`
+resolves to the Ontario one instead of the UK default. The part after the comma is matched
+against the country name, its two-letter code, or the region — a bare name just takes
+Open-Meteo's top match.
+
 Unknown place -> a clean GraphQL error with code `PLACE_NOT_FOUND` rather than a crash.
 
 ## Running it
@@ -69,6 +74,12 @@ A few deliberate choices about how this is put together:
 - **Geocoding cached in the DB.** A place name is resolved to coordinates once and saved in
   the `locations` table, so we never spend an Open-Meteo geocode call on the same place
   twice.
+- **Disambiguating places by country.** Names like "Alps" or "London" exist in more than one
+  country. Passing `"London, Canada"` narrows it down. Open-Meteo's geocoding has no country
+  filter, so we pull the top handful of candidates and keep the first whose country name,
+  two-letter code, or region matches the part after the comma. A bare name still takes the
+  API's top match, and the country becomes part of the cache key — so `"Alps"` and
+  `"Alps, Switzerland"` are stored and cached as separate places.
 
 ## How it works
 

@@ -32,9 +32,6 @@ export async function loadForecast(place: string): Promise<Forecast | null> {
   return { location, days: getStoredWeek(location.id) };
 }
 
-// Fold the marine forecast into each matching WeatherDay by date. Days without a
-// marine reading (inland spots, or a failed marine fetch) keep their null wave
-// fields.
 function mergeMarine(week: WeatherDay[], marine: MarineDay[]): WeatherDay[] {
   const byDate = new Map(marine.map((m) => [m.date, m]));
   return week.map((day) => {
