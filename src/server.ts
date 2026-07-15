@@ -1,24 +1,12 @@
 import { createServer } from "node:http";
 import { createYoga, createSchema } from "graphql-yoga";
 import { config } from "./config.js";
+import { typeDefs } from "./graphql/typeDefs.js";
+import { resolvers } from "./graphql/resolvers.js";
 
-// server to prove GraphQL Yoga boots.
-const schema = createSchema({
-  typeDefs: `
-    type Query {
-      hello: String!
-    }
-  `,
-  resolvers: {
-    Query: {
-      hello: () => "the vacation ranker is up",
-    },
-  },
-});
-
+const schema = createSchema({ typeDefs, resolvers });
 const yoga = createYoga({ schema });
 
-// Added a health check route
 const server = createServer((req, res) => {
   if (req.url === "/health") {
     res.writeHead(200, { "content-type": "application/json" });

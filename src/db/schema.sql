@@ -1,6 +1,6 @@
 -- Tables for the vacation ranking service.
 
--- Location which we already looked or fetched, we get geocode from db.
+-- Location which we already fetched, we get geocode from db.
 CREATE TABLE IF NOT EXISTS locations (
   id          INTEGER PRIMARY KEY AUTOINCREMENT,
   slug        TEXT UNIQUE NOT NULL,          
@@ -27,6 +27,10 @@ CREATE TABLE IF NOT EXISTS daily_weather (
   uv_max            REAL,
   sunshine_seconds  REAL,
   weather_code      INTEGER,
+  wave_height_max   REAL,
+  wave_period_max   REAL,
+  swell_height_max  REAL,
+  swell_period_max  REAL,
   fetched_at        TEXT NOT NULL DEFAULT (datetime('now')),
   UNIQUE (location_id, date)
 );
